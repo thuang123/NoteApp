@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import com.project.noteapp.ImageViewerActivity;
 import com.project.noteapp.R;
+import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.util.List;
@@ -46,7 +47,7 @@ public class ListAdapter extends ArrayAdapter<File> {
             ViewHolder viewHolder = new ViewHolder((ImageView) convertView.findViewById(R.id.list_item_thumbnail), (TextView) convertView.findViewById(R.id.list_item_text));
 
             final Context that = this.context;
-            viewHolder.title.setOnClickListener(new View.OnClickListener() {
+            viewHolder.getTitle().setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(that, ImageViewerActivity.class);
@@ -54,13 +55,12 @@ public class ListAdapter extends ArrayAdapter<File> {
                     that.startActivity(intent);
                 }
             });
-
             convertView.setTag(viewHolder);
         }
-
         mainViewHolder = (ViewHolder) convertView.getTag();
         mainViewHolder.setTitle(imageFile.getFileName());
-        mainViewHolder.setThumbnail(imageFile.getThumbnail());
+        Picasso.get().load(currentFile).fit().into(mainViewHolder.getThumbnail());
+
         return convertView;
     }
 }

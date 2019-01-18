@@ -46,7 +46,13 @@ public class MainActivity extends AppCompatActivity {
 
         File directory = new File(noteAppPicturePath);
         File[] files = directory.listFiles();
-        ArrayList<File> data = new ArrayList<>(Arrays.asList(files));
+        if (files != null && files.length != 0) {
+            ArrayList<File> data = new ArrayList<>(Arrays.asList(files));
+            ListView listView = findViewById(R.id.listview);
+            listView.setAdapter(new ListAdapter(this, R.layout.list_item, data));
+        } else {
+            System.out.println("Data was empty <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+        }
 //        if (files != null) {
 //            for (int i = 0; i < files.length; i++) {
 //                Log.d("Files", "FileName:" + files[i].getName());
@@ -55,13 +61,6 @@ public class MainActivity extends AppCompatActivity {
 //                data.add(imageFile);
 //            }
 //        }
-
-        if (!data.isEmpty()) {
-            ListView listView = findViewById(R.id.listview);
-            listView.setAdapter(new ListAdapter(this, R.layout.list_item, data));
-        } else {
-            System.out.println("Data was empty <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
-        }
     }
 
     /** Create a File for saving an image on device **/

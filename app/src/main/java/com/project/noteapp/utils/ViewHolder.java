@@ -7,7 +7,7 @@ import android.widget.TextView;
 public class ViewHolder {
 
     private ImageView thumbnail;
-    public TextView title;
+    private TextView title;
 
     public ViewHolder(ImageView thumbnail, TextView title) {
         this.thumbnail = thumbnail;
