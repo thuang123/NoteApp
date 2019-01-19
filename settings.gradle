@@ -1,1 +1,1 @@
-include ':app', ':scanlibrary', ':sdk'
+include ':app'
