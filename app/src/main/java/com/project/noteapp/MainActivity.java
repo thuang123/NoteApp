@@ -53,14 +53,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             System.out.println("Data was empty <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
         }
-//        if (files != null) {
-//            for (int i = 0; i < files.length; i++) {
-//                Log.d("Files", "FileName:" + files[i].getName());
-//                Bitmap currentThumbnail = ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(files[i].getPath()), THUMBNAIL_SIZE, THUMBNAIL_SIZE);
-//                ImageFile imageFile = new ImageFile(currentThumbnail, files[i].getName());
-//                data.add(imageFile);
-//            }
-//        }
+
     }
 
     /** Create a File for saving an image on device **/
