@@ -6,6 +6,8 @@
 /.idea/modules.xml
 /.idea/workspace.xml
 /.idea/misc.xml
+/sdk/
+/scanlibrary/
 .DS_Store
 /build
 /captures
