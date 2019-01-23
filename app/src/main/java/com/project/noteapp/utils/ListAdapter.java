@@ -47,14 +47,17 @@ public class ListAdapter extends ArrayAdapter<File> {
             ViewHolder viewHolder = new ViewHolder((ImageView) convertView.findViewById(R.id.list_item_thumbnail), (TextView) convertView.findViewById(R.id.list_item_text));
 
             final Context that = this.context;
-            viewHolder.getTitle().setOnClickListener(new View.OnClickListener() {
+            View.OnClickListener openImageListener = new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(that, ImageViewerActivity.class);
                     intent.setData(Uri.fromFile(currentFile));
                     that.startActivity(intent);
                 }
-            });
+            };
+            viewHolder.getTitle().setOnClickListener(openImageListener);
+            viewHolder.getThumbnail().setOnClickListener(openImageListener);
+
             convertView.setTag(viewHolder);
         }
         mainViewHolder = (ViewHolder) convertView.getTag();
