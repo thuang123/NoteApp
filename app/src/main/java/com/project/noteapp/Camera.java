@@ -21,7 +21,6 @@ public class Camera {
 
     private File storageDir;
     private Activity activity;
-    static final int REQUEST_TAKE_PHOTO = 1;
     private PackageManager packageManager;
 
     private static final int REQUEST_OPEN = 99;
@@ -32,6 +31,10 @@ public class Camera {
         this.storageDir = getApplicationStorageDirectory();
     }
 
+    /**
+     * Creates a new file for an image to be saved into within the device's ../Picture/NoteApp directory.
+     * @return File with corresponding name uniquely identified with date and time.
+     */
     public File createImageFile() throws IOException {
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
@@ -44,7 +47,12 @@ public class Camera {
         return image;
     }
 
-    /** Create a File for saving an image on device **/
+    /**
+     * Initializes and returns the NoteApp data directory under device's main Picture directory
+     * for application data storage.
+     * Returns existing directory if one already exists.
+     * @return File pointing to device's ../Picture/NoteApp directory
+     */
     private static File getApplicationStorageDirectory(){
         // To be safe, you should check that the SDCard is mounted
         // using Environment.getExternalStorageState() before doing this.
@@ -63,6 +71,10 @@ public class Camera {
         return mediaStorageDir;
     }
 
+    /**
+     * Creates a new intent to for image capture with device's camera.
+     * Utilizes ScanLibrary external library for scan functionality.
+     */
     public void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(this.activity, ScanActivity.class);
         // Ensure that there's a camera activity to handle the intent

@@ -29,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     private final static int REQUEST_CODE = 99;
 
     private Camera appCamera;
+    private ListAdapter appData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,19 +50,22 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // Find NoteApp image files
-        String noteAppPicturePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).toString()+"/NoteApp";
-        File directory = new File(noteAppPicturePath);
-        File[] files = directory.listFiles();
-        if (files != null && files.length != 0) {
-            ArrayList<File> data = new ArrayList<>(Arrays.asList(files));
+        ArrayList<File> data = getApplicationPathData();
+        if (data != null || !data.isEmpty()) {
             ListView listView = findViewById(R.id.listview);
-            listView.setAdapter(new ListAdapter(this, R.layout.list_item, data));
+            this.appData = new ListAdapter(this, R.layout.list_item, data);
+            listView.setAdapter(this.appData);
         } else {
             System.out.println("Data was empty <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
         }
 
     }
 
+    /**
+     * Overrides default onActivityResult() method to retrieve image data from application's camera capture.
+     * Saves temporary image capture data into a new file stored into device's ../Picture/NoteApp directory.
+     * Updates application data ListAdapter view for display new captured data.
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -78,9 +82,32 @@ public class MainActivity extends AppCompatActivity {
                 // Cleanup temporary data
                 getContentResolver().delete(uri, null, null);
                 System.out.println("Photo was successfully saved into: >>>>>>>>>>>>>>>>>>>>>> " + Uri.fromFile(photoFile).toString());
+                // Update appData displayed in application
+                ArrayList<File> updatedAppData = getApplicationPathData();
+                if (updatedAppData != null || !updatedAppData.isEmpty()) {
+                    this.appData.clear();
+                    this.appData.addAll(updatedAppData);
+                    this.appData.notifyDataSetChanged();
+                }
             } catch(IOException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    /**
+     * Retrieves the data found within the device's picture directory inside NoteApp folder.
+     * @return An array list containing the files contained in device within NoteApp folder
+     *         or null if the retrieved data is empty
+     */
+    private ArrayList<File> getApplicationPathData() {
+        String noteAppPicturePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).toString()+"/NoteApp";
+        File directory = new File(noteAppPicturePath);
+        File[] files = directory.listFiles();
+        if (files != null && files.length != 0) {
+            return new ArrayList<>(Arrays.asList(files));
+        } else {
+            return null;
         }
     }
 }
