@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import com.project.noteapp.utils.ListAdapter;
 import com.scanlibrary.ScanConstants;
@@ -41,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
                 new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
                 1);
 
-        final Button cameraButton = findViewById(R.id.CameraButton);
+        final ImageButton cameraButton = findViewById(R.id.CameraButton);
         this.appCamera = new Camera(this, getPackageManager());
         cameraButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {

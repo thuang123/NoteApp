@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
@@ -28,7 +29,7 @@ public class ImageViewerActivity extends AppCompatActivity {
         ImageView imageView = findViewById(R.id.imageView);
         Picasso.get().load(data).fit().into(imageView);
 
-        final Button button = findViewById(R.id.ReturnButton);
+        final ImageButton button = findViewById(R.id.ReturnButton);
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 finish();
