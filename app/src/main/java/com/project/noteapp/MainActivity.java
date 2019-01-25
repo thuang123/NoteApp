@@ -2,9 +2,11 @@ package com.project.noteapp;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
@@ -12,7 +14,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import com.project.noteapp.utils.ListAdapter;
@@ -30,7 +31,6 @@ public class MainActivity extends AppCompatActivity {
     private final static int REQUEST_CODE = 99;
 
     private Camera appCamera;
-    private ListAdapter appData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,15 +51,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // Find NoteApp image files
-        ArrayList<File> data = getApplicationPathData();
-        if (data != null || !data.isEmpty()) {
-            ListView listView = findViewById(R.id.listview);
-            this.appData = new ListAdapter(this, R.layout.list_item, data);
-            listView.setAdapter(this.appData);
-        } else {
-            System.out.println("Data was empty <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
-        }
-
+        new ApplicationPathDataRetrievalTask(this, null, (ListView) findViewById(R.id.listview)).execute();
     }
 
     /**
@@ -84,12 +76,7 @@ public class MainActivity extends AppCompatActivity {
                 getContentResolver().delete(uri, null, null);
                 System.out.println("Photo was successfully saved into: >>>>>>>>>>>>>>>>>>>>>> " + Uri.fromFile(photoFile).toString());
                 // Update appData displayed in application
-                ArrayList<File> updatedAppData = getApplicationPathData();
-                if (updatedAppData != null || !updatedAppData.isEmpty()) {
-                    this.appData.clear();
-                    this.appData.addAll(updatedAppData);
-                    this.appData.notifyDataSetChanged();
-                }
+                new ApplicationPathDataRetrievalTask(this, null, (ListView) findViewById(R.id.listview)).execute();
             } catch(IOException e) {
                 e.printStackTrace();
             }
@@ -97,18 +84,43 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Retrieves the data found within the device's picture directory inside NoteApp folder.
-     * @return An array list containing the files contained in device within NoteApp folder
-     *         or null if the retrieved data is empty
+     * Retrieves the data found within the device's picture directory inside NoteApp folder and
+     * passes data to ListAdapter to create ListView of data.
      */
-    private ArrayList<File> getApplicationPathData() {
-        String noteAppPicturePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).toString()+"/NoteApp";
-        File directory = new File(noteAppPicturePath);
-        File[] files = directory.listFiles();
-        if (files != null && files.length != 0) {
-            return new ArrayList<>(Arrays.asList(files));
-        } else {
-            return null;
+    private static class ApplicationPathDataRetrievalTask extends AsyncTask<String, Void, ArrayList<File>> {
+
+        private Context context;
+        private ListAdapter appData;
+        private ListView appListView;
+
+        private ApplicationPathDataRetrievalTask(Context context, ListAdapter appData, ListView appListView) {
+            this.context = context;
+            this.appData = appData;
+            this.appListView = appListView;
+        }
+
+        @Override
+        protected ArrayList<File> doInBackground(String... params) {
+            String noteAppPicturePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).toString()+"/NoteApp";
+            File directory = new File(noteAppPicturePath);
+            File[] files = directory.listFiles();
+            if (files != null && files.length != 0) {
+                return new ArrayList<>(Arrays.asList(files));
+            } else {
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<File> result) {
+            super.onPostExecute(result);
+            if (result != null || !result.isEmpty()) {
+                ListView listView = this.appListView;
+                this.appData = new ListAdapter(this.context, R.layout.list_item, result);
+                listView.setAdapter(this.appData);
+            } else {
+                System.out.println("Data was empty <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+            }
         }
     }
 }
