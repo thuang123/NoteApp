@@ -2,8 +2,8 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
     android:descendantFocusability="blocksDescendants">
 
     <ImageView
@@ -30,6 +30,7 @@
         android:layout_marginEnd="20dp"
         android:layout_marginRight="20dp"
         android:text="TextView"
-        app:layout_constraintEnd_toEndOf="@+id/CameraButton"
+        app:layout_constraintEnd_toEndOf="@+id/camera_button"
         app:layout_constraintStart_toEndOf="@+id/list_item_thumbnail"/>
+
 </android.support.constraint.ConstraintLayout>

@@ -6,15 +6,16 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <ListView
-        android:id="@+id/listview"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerview"
         android:layout_width="fill_parent"
         android:layout_height="473dp"
-        android:layout_above="@+id/CameraButton"
-        android:layout_alignParentTop="true"></ListView>
+        android:layout_above="@+id/camera_button"
+        android:layout_alignParentTop="true"
+        app:layoutManager="android.support.v7.widget.LinearLayoutManager"></android.support.v7.widget.RecyclerView>
 
     <ImageButton
-        android:id="@+id/CameraButton"
+        android:id="@+id/camera_button"
         android:layout_width="81dp"
         android:layout_height="67dp"
         android:background="@android:color/transparent"

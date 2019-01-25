@@ -12,11 +12,11 @@ import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
-import android.widget.ListView;
-import com.project.noteapp.utils.ListAdapter;
+import com.project.noteapp.utils.RecycleAdapter;
 import com.scanlibrary.ScanConstants;
 
 import java.io.File;
@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
                 new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
                 1);
 
-        final ImageButton cameraButton = findViewById(R.id.CameraButton);
+        final ImageButton cameraButton = findViewById(R.id.camera_button);
         this.appCamera = new Camera(this, getPackageManager());
         cameraButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // Find NoteApp image files
-        new ApplicationPathDataRetrievalTask(this, null, (ListView) findViewById(R.id.listview)).execute();
+        new ApplicationPathDataRetrievalTask(this, null, (RecyclerView) findViewById(R.id.recyclerview)).execute();
     }
 
     /**
@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
                 getContentResolver().delete(uri, null, null);
                 System.out.println("Photo was successfully saved into: >>>>>>>>>>>>>>>>>>>>>> " + Uri.fromFile(photoFile).toString());
                 // Update appData displayed in application
-                new ApplicationPathDataRetrievalTask(this, null, (ListView) findViewById(R.id.listview)).execute();
+                new ApplicationPathDataRetrievalTask(this, null, (RecyclerView) findViewById(R.id.recyclerview)).execute();
             } catch(IOException e) {
                 e.printStackTrace();
             }
@@ -90,13 +90,13 @@ public class MainActivity extends AppCompatActivity {
     private static class ApplicationPathDataRetrievalTask extends AsyncTask<String, Void, ArrayList<File>> {
 
         private Context context;
-        private ListAdapter appData;
-        private ListView appListView;
+        private RecycleAdapter appData;
+        private RecyclerView appRecyclerView;
 
-        private ApplicationPathDataRetrievalTask(Context context, ListAdapter appData, ListView appListView) {
+        private ApplicationPathDataRetrievalTask(Context context, RecycleAdapter appData, RecyclerView appRecyclerView) {
             this.context = context;
             this.appData = appData;
-            this.appListView = appListView;
+            this.appRecyclerView = appRecyclerView;
         }
 
         @Override
@@ -115,9 +115,9 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(ArrayList<File> result) {
             super.onPostExecute(result);
             if (result != null || !result.isEmpty()) {
-                ListView listView = this.appListView;
-                this.appData = new ListAdapter(this.context, R.layout.list_item, result);
-                listView.setAdapter(this.appData);
+                RecyclerView recyclerView = this.appRecyclerView;
+                this.appData = new RecycleAdapter(this.context, result);
+                recyclerView.setAdapter(this.appData);
             } else {
                 System.out.println("Data was empty <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
             }
