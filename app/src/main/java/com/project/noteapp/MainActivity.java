@@ -114,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(ArrayList<File> result) {
             super.onPostExecute(result);
-            if (result != null || !result.isEmpty()) {
+            if (result != null && !result.isEmpty()) {
                 RecyclerView recyclerView = this.appRecyclerView;
                 this.appData = new RecycleAdapter(this.context, result);
                 recyclerView.setAdapter(this.appData);
