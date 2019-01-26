@@ -3,6 +3,7 @@ package com.project.noteapp;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -10,12 +11,21 @@ import android.os.AsyncTask;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
+import android.text.InputType;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.Toast;
+
+import com.project.noteapp.utils.FolderManager;
 import com.project.noteapp.utils.RecycleAdapter;
 import com.scanlibrary.ScanConstants;
 
@@ -31,6 +41,10 @@ public class MainActivity extends AppCompatActivity {
     private final static int REQUEST_CODE = 99;
 
     private Camera appCamera;
+    private String currentLocation;
+
+    private FolderManager folderManager;
+    private String newFolderName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,12 +52,16 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Log.d(TAG, "started successfully. <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
 
+        // Initial startup in "main" folder
+        this.currentLocation = "main";
+        this.folderManager = new FolderManager(getApplicationStorageDirectory());
+
         ActivityCompat.requestPermissions(MainActivity.this,
                 new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
                 1);
 
         final ImageButton cameraButton = findViewById(R.id.camera_button);
-        this.appCamera = new Camera(this, getPackageManager());
+        this.appCamera = new Camera(this, getPackageManager(), getApplicationStorageDirectory());
         cameraButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 appCamera.dispatchTakePictureIntent();
@@ -52,6 +70,63 @@ public class MainActivity extends AppCompatActivity {
 
         // Find NoteApp image files
         new ApplicationPathDataRetrievalTask(this, null, (RecyclerView) findViewById(R.id.recyclerview)).execute();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    /**
+     * Specifies Menu option functionality
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        // New folder functionality
+        if(id == R.id.menu_new_folder){
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Specify a new folder name:");
+            builder.setPositiveButton(android.R.string.ok, null);
+            // Set up the input
+            final EditText input = new EditText(this);
+            // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+            input.setInputType(InputType.TYPE_CLASS_TEXT);
+            builder.setView(input);
+            builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
+            });
+            // Set up the buttons
+            builder.setPositiveButton(R.string.ok, null);
+            final AlertDialog alertDialog = builder.create();
+            alertDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+                @Override
+                public void onShow(DialogInterface dialogInterface) {
+                    Button button = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                    button.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            String inputString = input.getText().toString();
+                            if (inputString != null || !inputString.equals("")) {
+                                newFolderName = inputString;
+                                alertDialog.dismiss();
+                            }
+                        }
+                    });
+                }
+            });
+            builder.show();
+
+            if (newFolderName != null && !newFolderName.equals("")) {
+                this.folderManager.createNewFolder(newFolderName);
+                newFolderName = null;
+            }
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     /**
@@ -65,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             Uri uri = data.getExtras().getParcelable(ScanConstants.SCANNED_RESULT);
             try {
-                File photoFile = appCamera.createImageFile();
+                File photoFile = appCamera.createImageFile(this.currentLocation);
                 Bitmap bitMap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
                 // Save scanned bitmap data into created image file
                 FileOutputStream outStream = new FileOutputStream(photoFile);
@@ -81,6 +156,30 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
+    }
+
+    /**
+     * Initializes and returns the NoteApp data directory under device's main Picture directory
+     * for application data storage.
+     * Returns existing directory if one already exists.
+     * @return File pointing to device's ../Picture/NoteApp directory
+     */
+    private static File getApplicationStorageDirectory(){
+        // To be safe, you should check that the SDCard is mounted
+        // using Environment.getExternalStorageState() before doing this.
+        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES), "NoteApp");
+        // This location works best if you want the created images to be shared
+        // between applications and persist after your app has been uninstalled.
+
+        // Create the storage directory if it does not exist
+        if (!mediaStorageDir.exists()){
+            if (!mediaStorageDir.mkdirs()){
+                Log.d("NoteApp", "failed to create directory");
+                return null;
+            }
+        }
+        return mediaStorageDir;
     }
 
     /**
