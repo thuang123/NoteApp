@@ -140,6 +140,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
                 // Set up the buttons
+                final Context that = this;
                 builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
@@ -150,18 +151,17 @@ public class MainActivity extends AppCompatActivity {
                             folderManager.createNewFolder(newFolderName);
                             newFolderName = null;
                             alertDialog.dismiss();
-
+                            new ApplicationPathDataRetrievalTask(that, null, (RecyclerView) findViewById(R.id.recyclerview)).execute();
                         }
-
                     }
                 });
+
 /**
                 if (newFolderName != null && !newFolderName.equals("")) {
                     this.folderManager.createNewFolder(newFolderName);
                     newFolderName = null;
                 }*/
                 builder.show();
-                new ApplicationPathDataRetrievalTask(this, null, (RecyclerView) findViewById(R.id.recyclerview)).execute();
 
         }
         return super.onOptionsItemSelected(item);

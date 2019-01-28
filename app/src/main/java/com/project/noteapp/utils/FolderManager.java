@@ -1,5 +1,6 @@
 package com.project.noteapp.utils;
 
+import android.app.Activity;
 import android.util.Log;
 
 import java.io.File;
@@ -7,6 +8,7 @@ import java.io.File;
 public class FolderManager {
 
     private File storageDir;
+    private Activity activity;
 
     public FolderManager(File storageDir) {
         this.storageDir = storageDir;
