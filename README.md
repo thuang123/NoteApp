@@ -23,7 +23,7 @@ External library [AndroidScannerDemo](https://github.com/jhansireddy/AndroidScan
 
 [OpenCV Framework](https://opencv.org/)
 
-Note: Make sure the compileSdkVersion, minSdkVersion, and targetSdkVersion are the same across all build.gradle files.  Remove buildToolsVersion in scanlibrary build.gradle file as not required for newer versions of Gradle.
+Note: Make sure compileSdkVersion, minSdkVersion, and targetSdkVersion is the same across all the build.gradle files.  Remove buildToolsVersion in the Scanlibrary's build.gradle file as it is not required for newer versions of Gradle.
 
 ## Usage
 
