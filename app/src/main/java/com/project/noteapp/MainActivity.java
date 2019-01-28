@@ -28,6 +28,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
+import com.project.noteapp.utils.DividerItemDecoration;
 import com.project.noteapp.utils.FolderManager;
 import com.project.noteapp.utils.RecycleAdapter;
 import com.scanlibrary.ScanConstants;
@@ -73,11 +74,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Find NoteApp image files
-        new ApplicationPathDataRetrievalTask(this, null, (RecyclerView) findViewById(R.id.recyclerview)).execute();
-
         drawerlayout = findViewById(R.id.drawer_layout);
-
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
@@ -99,6 +96,12 @@ public class MainActivity extends AppCompatActivity {
         ActionBar actionbar = getSupportActionBar();
         actionbar.setDisplayHomeAsUpEnabled(true);
         actionbar.setHomeAsUpIndicator(R.drawable.ic_hamburger);
+
+        RecyclerView recyclerView = findViewById(R.id.recyclerview);
+        recyclerView.addItemDecoration(new DividerItemDecoration(this));
+
+        // Find NoteApp image files
+        new ApplicationPathDataRetrievalTask(this, null, (RecyclerView) findViewById(R.id.recyclerview)).execute();
     }
 
     @Override

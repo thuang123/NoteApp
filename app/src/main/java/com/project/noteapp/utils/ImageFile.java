@@ -3,8 +3,9 @@ package com.project.noteapp.utils;
 import android.graphics.Bitmap;
 
 public class ImageFile {
-    Bitmap imageThumbnail;
-    String imageFileName;
+
+    private Bitmap imageThumbnail;
+    private String imageFileName;
 
     public ImageFile(Bitmap thumbnail, String fileName) {
         this.imageThumbnail = thumbnail;
