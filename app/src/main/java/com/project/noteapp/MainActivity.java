@@ -10,11 +10,16 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
@@ -25,6 +30,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import com.project.noteapp.utils.Folder;
 import com.project.noteapp.utils.FolderManager;
 import com.project.noteapp.utils.RecycleAdapter;
 import com.scanlibrary.ScanConstants;
@@ -45,6 +51,8 @@ public class MainActivity extends AppCompatActivity {
 
     private FolderManager folderManager;
     private String newFolderName;
+
+    private DrawerLayout drawerlayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +78,30 @@ public class MainActivity extends AppCompatActivity {
 
         // Find NoteApp image files
         new ApplicationPathDataRetrievalTask(this, null, (RecyclerView) findViewById(R.id.recyclerview)).execute();
+
+        drawerlayout = findViewById(R.id.drawer_layout);
+
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(
+                new NavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(MenuItem menuItem) {
+                        // set item as selected to persist highlight
+                        menuItem.setChecked(true);
+                        // close drawer when item is tapped
+                        drawerlayout.closeDrawers();
+
+                        // Add code here to update the UI based on the item selected
+                        // For example, swap UI fragments here
+
+                        return true;
+                    }
+                });
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        ActionBar actionbar = getSupportActionBar();
+        actionbar.setDisplayHomeAsUpEnabled(true);
+        actionbar.setHomeAsUpIndicator(R.drawable.ic_hamburger);
     }
 
     @Override
@@ -84,47 +116,51 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        // New folder functionality
-        if(id == R.id.menu_new_folder){
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Specify a new folder name:");
-            builder.setPositiveButton(android.R.string.ok, null);
-            // Set up the input
-            final EditText input = new EditText(this);
-            // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
-            input.setInputType(InputType.TYPE_CLASS_TEXT);
-            builder.setView(input);
-            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.cancel();
-                }
-            });
-            // Set up the buttons
-            builder.setPositiveButton(R.string.ok, null);
-            final AlertDialog alertDialog = builder.create();
-            alertDialog.setOnShowListener(new DialogInterface.OnShowListener() {
-                @Override
-                public void onShow(DialogInterface dialogInterface) {
-                    Button button = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
-                    button.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            String inputString = input.getText().toString();
-                            if (inputString != null || !inputString.equals("")) {
-                                newFolderName = inputString;
-                                alertDialog.dismiss();
-                            }
-                        }
-                    });
-                }
-            });
-            builder.show();
 
-            if (newFolderName != null && !newFolderName.equals("")) {
-                this.folderManager.createNewFolder(newFolderName);
-                newFolderName = null;
-            }
+
+        switch (id) {
+            //Opens up drawer when hamburger icon is pressed
+            case android.R.id.home:
+                drawerlayout.openDrawer(GravityCompat.START);
+                return true;
+
+
+            // New folder functionality
+            case R.id.menu_new_folder:
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("Specify a new folder name:");
+                builder.setPositiveButton(android.R.string.ok, null);
+                // Set up the input
+                final EditText input = new EditText(this);
+                final AlertDialog alertDialog = builder.create();
+                // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+                input.setInputType(InputType.TYPE_CLASS_TEXT);
+                builder.setView(input);
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+                // Set up the buttons
+                builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Log.d("pressed","pressed");
+                        String inputString = input.getText().toString();
+                        if (inputString != null || !inputString.equals("")) {
+                            newFolderName = inputString;
+                            alertDialog.dismiss();
+                        }
+                    }
+                });
+
+                if (newFolderName != null && !newFolderName.equals("")) {
+                    this.folderManager.createNewFolder(newFolderName);
+                    newFolderName = null;
+                }
+                builder.show();
+
         }
         return super.onOptionsItemSelected(item);
     }
@@ -152,7 +188,7 @@ public class MainActivity extends AppCompatActivity {
                 System.out.println("Photo was successfully saved into: >>>>>>>>>>>>>>>>>>>>>> " + Uri.fromFile(photoFile).toString());
                 // Update appData displayed in application
                 new ApplicationPathDataRetrievalTask(this, null, (RecyclerView) findViewById(R.id.recyclerview)).execute();
-            } catch(IOException e) {
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }
@@ -162,9 +198,10 @@ public class MainActivity extends AppCompatActivity {
      * Initializes and returns the NoteApp data directory under device's main Picture directory
      * for application data storage.
      * Returns existing directory if one already exists.
+     *
      * @return File pointing to device's ../Picture/NoteApp directory
      */
-    private static File getApplicationStorageDirectory(){
+    private static File getApplicationStorageDirectory() {
         // To be safe, you should check that the SDCard is mounted
         // using Environment.getExternalStorageState() before doing this.
         File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
@@ -173,8 +210,8 @@ public class MainActivity extends AppCompatActivity {
         // between applications and persist after your app has been uninstalled.
 
         // Create the storage directory if it does not exist
-        if (!mediaStorageDir.exists()){
-            if (!mediaStorageDir.mkdirs()){
+        if (!mediaStorageDir.exists()) {
+            if (!mediaStorageDir.mkdirs()) {
                 Log.d("NoteApp", "failed to create directory");
                 return null;
             }
@@ -200,7 +237,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected ArrayList<File> doInBackground(String... params) {
-            String noteAppPicturePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).toString()+"/NoteApp";
+            String noteAppPicturePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).toString() + "/NoteApp";
             File directory = new File(noteAppPicturePath);
             File[] files = directory.listFiles();
             if (files != null && files.length != 0) {
