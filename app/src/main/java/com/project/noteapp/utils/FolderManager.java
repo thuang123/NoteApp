@@ -1,5 +1,7 @@
 package com.project.noteapp.utils;
 
+import android.util.Log;
+
 import java.io.File;
 
 public class FolderManager {
@@ -12,7 +14,11 @@ public class FolderManager {
 
     public File createNewFolder(String folderName) {
         File folder = new File(this.storageDir.getPath() + File.separator +
-                folderName + ".txt");
+                folderName);
+        if (!folder.mkdirs()) {
+            Log.d("NoteApp", "failed to create directory");
+            return null;
+        }
         return folder;
     }
 }

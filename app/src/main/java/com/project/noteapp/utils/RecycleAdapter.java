@@ -46,8 +46,13 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
         final File currentFile = objects.get(position);
         Bitmap currentThumbnail = ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(currentFile.getPath()), THUMBNAIL_SIZE, THUMBNAIL_SIZE);
         ImageFile imageFile = new ImageFile(currentThumbnail, currentFile.getName());
+        //Folder folder = new Folder()
 
         holder.setTitle(imageFile.getFileName());
+
+     //   if(currentFile instanceof Folder) {
+     //   }
+
         Picasso.get().load(currentFile).fit().into(holder.getThumbnail());
 
         final Context that = this.context;
