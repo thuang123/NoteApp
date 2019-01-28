@@ -150,16 +150,21 @@ public class MainActivity extends AppCompatActivity {
                         String inputString = input.getText().toString();
                         if (inputString != null || !inputString.equals("")) {
                             newFolderName = inputString;
+                            folderManager.createNewFolder(newFolderName);
+                            newFolderName = null;
                             alertDialog.dismiss();
+
                         }
+
                     }
                 });
-
+/**
                 if (newFolderName != null && !newFolderName.equals("")) {
                     this.folderManager.createNewFolder(newFolderName);
                     newFolderName = null;
-                }
+                }*/
                 builder.show();
+                new ApplicationPathDataRetrievalTask(this, null, (RecyclerView) findViewById(R.id.recyclerview)).execute();
 
         }
         return super.onOptionsItemSelected(item);
