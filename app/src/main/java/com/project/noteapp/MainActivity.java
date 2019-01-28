@@ -25,12 +25,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.Toast;
 
-import com.project.noteapp.utils.Folder;
 import com.project.noteapp.utils.FolderManager;
 import com.project.noteapp.utils.RecycleAdapter;
 import com.scanlibrary.ScanConstants;
