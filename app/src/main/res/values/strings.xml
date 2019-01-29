@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">NoteApp</string>
     <string name="add_folder">New Folder</string>
+    <string name="vertical_more_options">&#8942;</string>
 </resources>
