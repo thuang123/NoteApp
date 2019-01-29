@@ -12,11 +12,13 @@ public class RecyclerViewHolder extends RecyclerView.ViewHolder {
 
     private ImageView thumbnail;
     private TextView title;
+    private TextView optionsMenu;
 
     public RecyclerViewHolder(View listItemView) {
         super(listItemView);
         this.thumbnail = listItemView.findViewById(R.id.list_item_thumbnail);
         this.title = listItemView.findViewById(R.id.list_item_text);
+        this.optionsMenu = listItemView.findViewById(R.id.textViewOptions);
     }
 
     public void setThumbnail(Bitmap thumbnail) {
@@ -27,11 +29,19 @@ public class RecyclerViewHolder extends RecyclerView.ViewHolder {
         this.title.setText(title);
     }
 
+    public void setOptionsMenu(TextView optionsMenu) {
+        this.optionsMenu = optionsMenu;
+    }
+
     public ImageView getThumbnail() {
         return this.thumbnail;
     }
 
     public TextView getTitle() {
         return this.title;
+    }
+
+    public TextView getOptionsMenu() {
+        return this.optionsMenu;
     }
 }

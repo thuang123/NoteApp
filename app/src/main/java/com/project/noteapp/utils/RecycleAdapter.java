@@ -7,10 +7,13 @@ import android.graphics.BitmapFactory;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.project.noteapp.ImageViewerActivity;
 import com.project.noteapp.R;
@@ -46,13 +49,8 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
         final File currentFile = objects.get(position);
         Bitmap currentThumbnail = ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(currentFile.getPath()), THUMBNAIL_SIZE, THUMBNAIL_SIZE);
         ImageFile imageFile = new ImageFile(currentThumbnail, currentFile.getName());
-        //Folder folder = new Folder()
 
         holder.setTitle(imageFile.getFileName());
-
-     //   if(currentFile instanceof Folder) {
-     //   }
-
         Picasso.get().load(currentFile).fit().into(holder.getThumbnail());
 
         final Context that = this.context;
@@ -66,6 +64,35 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
         };
         holder.getTitle().setOnClickListener(openImageListener);
         holder.getThumbnail().setOnClickListener(openImageListener);
+
+        final TextView thatOptionsMenu = holder.getOptionsMenu();
+        View.OnClickListener optionsMenuListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Creating a popup menu
+                PopupMenu popup = new PopupMenu(that, thatOptionsMenu);
+                // Inflating menu from xml resource
+                popup.inflate(R.menu.options_menu);
+                // Adding click listener
+                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        switch (item.getItemId()) {
+                            case R.id.delete_option:
+                                //handle menu1 click
+                                break;
+                            case R.id.convert_text_option:
+                                //handle menu2 click
+                                break;
+                        }
+                        return false;
+                    }
+                });
+                // Displaying the popup
+                popup.show();
+            }
+        };
+        holder.getOptionsMenu().setOnClickListener(optionsMenuListener);
     }
 
     @Override
