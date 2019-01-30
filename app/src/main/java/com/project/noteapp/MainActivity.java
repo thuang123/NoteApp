@@ -203,21 +203,22 @@ public class MainActivity extends AppCompatActivity {
      * @return File pointing to device's ../Picture/NoteApp directory
      */
     private static File getApplicationStorageDirectory() {
-        // To be safe, you should check that the SDCard is mounted
-        // using Environment.getExternalStorageState() before doing this.
-        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES), "NoteApp");
-        // This location works best if you want the created images to be shared
-        // between applications and persist after your app has been uninstalled.
-
-        // Create the storage directory if it does not exist
-        if (!mediaStorageDir.exists()) {
-            if (!mediaStorageDir.mkdirs()) {
-                Log.d("NoteApp", "failed to create directory");
-                return null;
+        String currentExternalStorageState = Environment.getExternalStorageState();
+        if (!currentExternalStorageState.equals(Environment.MEDIA_MOUNTED_READ_ONLY) && !currentExternalStorageState.equals(Environment.MEDIA_UNMOUNTED)) {
+            File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
+                    Environment.DIRECTORY_PICTURES), "NoteApp");
+            // Create the storage directory if it does not exist
+            if (!mediaStorageDir.exists()) {
+                if (!mediaStorageDir.mkdirs()) {
+                    Log.d("NoteApp", "failed to create directory");
+                    return null;
+                }
             }
+            return mediaStorageDir;
+        } else {
+            Log.d("NoteApp", "application storage directory retrieval failed.  Either media is READ only or SD is unmounted.");
+            return null;
         }
-        return mediaStorageDir;
     }
 
     /**
@@ -253,7 +254,7 @@ public class MainActivity extends AppCompatActivity {
             super.onPostExecute(result);
             if (result != null && !result.isEmpty()) {
                 RecyclerView recyclerView = this.appRecyclerView;
-                this.appData = new RecycleAdapter(this.context, result);
+                this.appData = new RecycleAdapter(this.context, result, getApplicationStorageDirectory());
                 recyclerView.setAdapter(this.appData);
             } else {
                 System.out.println("Data was empty <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");

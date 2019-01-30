@@ -7,14 +7,21 @@ import android.graphics.BitmapFactory;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.TextView;
 
+import com.google.android.gms.vision.Frame;
+import com.google.android.gms.vision.text.TextBlock;
+import com.google.android.gms.vision.text.TextRecognizer;
 import com.project.noteapp.ImageViewerActivity;
 import com.project.noteapp.R;
 import com.squareup.picasso.Picasso;
@@ -29,11 +36,13 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
     private LayoutInflater inflater;
     private Context context;
     private List<File> objects;
+    private final File storageDir;
 
-    public RecycleAdapter(@NonNull Context context, @NonNull List<File> objects) {
+    public RecycleAdapter(@NonNull Context context, @NonNull List<File> objects, File storageDir) {
         this.inflater = LayoutInflater.from(context);
         this.context = context;
         this.objects = objects;
+        this.storageDir = storageDir;
     }
 
     @Override
@@ -53,13 +62,14 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
         holder.setTitle(imageFile.getFileName());
         Picasso.get().load(currentFile).fit().into(holder.getThumbnail());
 
-        final Context that = this.context;
+        final Context thatContext = this.context;
+        final RecycleAdapter that = this;
         View.OnClickListener openImageListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(that, ImageViewerActivity.class);
+                Intent intent = new Intent(thatContext, ImageViewerActivity.class);
                 intent.setData(Uri.fromFile(currentFile));
-                that.startActivity(intent);
+                thatContext.startActivity(intent);
             }
         };
         holder.getTitle().setOnClickListener(openImageListener);
@@ -69,26 +79,25 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
         View.OnClickListener optionsMenuListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Creating a popup menu
-                PopupMenu popup = new PopupMenu(that, thatOptionsMenu);
-                // Inflating menu from xml resource
+                PopupMenu popup = new PopupMenu(thatContext, thatOptionsMenu);
                 popup.inflate(R.menu.options_menu);
-                // Adding click listener
                 popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
                         switch (item.getItemId()) {
                             case R.id.delete_option:
-                                //handle menu1 click
+                                // TODO: Delete option functionality
                                 break;
                             case R.id.convert_text_option:
-                                //handle menu2 click
+                                String filePath = currentFile.getPath();
+                                Bitmap bitMap = BitmapFactory.decodeFile(filePath);
+                                TextExtractor textExtractor = new TextExtractor(thatContext, that.storageDir);
+                                textExtractor.generateTextFileFromImage(bitMap);
                                 break;
                         }
                         return false;
                     }
                 });
-                // Displaying the popup
                 popup.show();
             }
         };
