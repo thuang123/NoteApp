@@ -10,6 +10,7 @@ Simple Android application for note taking involving image scan, crop, and captu
 - Add directory/folder system for managing captures for specific courses (In progress...)
 - Change “Take a photo” and “Return” buttons to better UI & more responsive camera/arrow icons
 - Conversion of written text in image to word document with [Java OCR](https://sourceforge.net/projects/javaocr/)
+- Add email/share/export option for converted word documents (In progress...)
 - Improve existing display of image capture data
 - Adding multithreading to improve scrolling of RecyclerView items
 - Update [AndroidScannerDemo](https://github.com/jhansireddy/AndroidScannerDemo) for newer Android version compatibility
