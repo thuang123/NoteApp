@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.support.annotation.NonNull;
@@ -64,18 +66,26 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
     public void onBindViewHolder(RecyclerViewHolder holder, int position) {
         final File currentFile = objects.get(position);
         Bitmap currentThumbnail;
+
+        //Temporary
         if(!currentFile.isDirectory()) {
             currentThumbnail = ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(currentFile.getPath())
                     , THUMBNAIL_SIZE, THUMBNAIL_SIZE);
         } else {
-            currentThumbnail = ThumbnailUtils.extractThumbnail(BitmapFactory.decodeResource(context.getResources()
-                    ,R.drawable.camera_icon), THUMBNAIL_SIZE, THUMBNAIL_SIZE);
+            Drawable d = context.getResources().getDrawable(R.drawable.camera_icon);
+            currentThumbnail = ThumbnailUtils.extractThumbnail(((BitmapDrawable)d).getBitmap(), THUMBNAIL_SIZE, THUMBNAIL_SIZE);
         }
 
         ImageFile imageFile = new ImageFile(currentThumbnail, currentFile.getName());
         holder.setTitle(imageFile.getFileName());
+        holder.setThumbnail(currentThumbnail);
 
-        Picasso.get().load(currentFile).fit().into(holder.getThumbnail());
+        //Check if the current file is an directory or an image file, displays the thumbnail image
+        if(!currentFile.isDirectory()) {
+            Picasso.get().load(currentFile).fit().into(holder.getThumbnail());
+        } else {
+            Picasso.get().load(R.drawable.ic_bluefolder).resize(50,50).into(holder.getThumbnail());
+        }
 
         final Context thatContext = this.context;
         final RecycleAdapter that = this;
