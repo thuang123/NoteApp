@@ -48,6 +48,7 @@ public class Camera {
     /**
      * Creates a new intent to for image capture with device's camera.
      * Utilizes ScanLibrary external library for scan functionality.
+     * On return to MainActivity.java, onActivityResult() gets called, which saves captured image data done here.
      */
     public void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(this.activity, ScanActivity.class);

@@ -11,6 +11,9 @@ import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
 
+/**
+ * Activity for generating and displaying image viewer for current selected image from MainActivity.
+ */
 public class ImageViewerActivity extends AppCompatActivity {
 
     private final static String TAG = "ImageViewerActivity";

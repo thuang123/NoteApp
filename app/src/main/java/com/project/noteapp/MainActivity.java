@@ -169,7 +169,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Overrides default onActivityResult() method to retrieve image data from application's camera capture.
      * Saves temporary image capture data into a new file stored into device's ../Picture/NoteApp directory.
-     * Updates application data ListAdapter view for display new captured data.
+     * Updates application data ListAdapter view for display new captured data by calling new ApplicationPathDataRetrievalTask().
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -237,6 +237,12 @@ public class MainActivity extends AppCompatActivity {
             this.appRecyclerView = appRecyclerView;
         }
 
+        /**
+         * The main purpose of AsyncTask used here to retrieve NoteApp data from device's picture directory, so
+         * the main thread can focus on rendering UI functionality.
+         * @returns Array list of all data contained within ../Picture/NoteApp or null if no files are found.
+         * This list is passed into onPostExecute() method immediately for processing.
+         */
         @Override
         protected ArrayList<File> doInBackground(String... params) {
             String noteAppPicturePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).toString() + "/NoteApp";
@@ -249,6 +255,11 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
+        /**
+         * @param result array list containing all data contained within device's ../Picture/NoteApp directory.
+         * Processes application data by passing data to a new RecycleAdapter that setups View objects and attaches listeners.
+         * RecycleAdapter is then attached to application's recyclerView which is contains the list data seen in application's MainActivity.
+         */
         @Override
         protected void onPostExecute(ArrayList<File> result) {
             super.onPostExecute(result);

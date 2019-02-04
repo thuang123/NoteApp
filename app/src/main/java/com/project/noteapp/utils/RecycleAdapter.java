@@ -53,6 +53,13 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
         return holder;
     }
 
+    /**
+     * Processes all the NoteApp data by attaching listeners and placing file data into views.  This method is called
+     * within an iteration through all the this.objects data.
+     * @param position which is the index of the current this.objects list being iterated through.
+     * @param holder which is a single list view object assigned to hold the image and text data that will be displayed
+     *               in the application.
+     */
     @Override
     public void onBindViewHolder(RecyclerViewHolder holder, int position) {
         final File currentFile = objects.get(position);
@@ -67,7 +74,6 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
 
         ImageFile imageFile = new ImageFile(currentThumbnail, currentFile.getName());
         holder.setTitle(imageFile.getFileName());
-
 
         Picasso.get().load(currentFile).fit().into(holder.getThumbnail());
 
