@@ -56,10 +56,19 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
     @Override
     public void onBindViewHolder(RecyclerViewHolder holder, int position) {
         final File currentFile = objects.get(position);
-        Bitmap currentThumbnail = ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(currentFile.getPath()), THUMBNAIL_SIZE, THUMBNAIL_SIZE);
-        ImageFile imageFile = new ImageFile(currentThumbnail, currentFile.getName());
+        Bitmap currentThumbnail;
+        if(!currentFile.isDirectory()) {
+            currentThumbnail = ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(currentFile.getPath())
+                    , THUMBNAIL_SIZE, THUMBNAIL_SIZE);
+        } else {
+            currentThumbnail = ThumbnailUtils.extractThumbnail(BitmapFactory.decodeResource(context.getResources()
+                    ,R.drawable.camera_icon), THUMBNAIL_SIZE, THUMBNAIL_SIZE);
+        }
 
+        ImageFile imageFile = new ImageFile(currentThumbnail, currentFile.getName());
         holder.setTitle(imageFile.getFileName());
+
+
         Picasso.get().load(currentFile).fit().into(holder.getThumbnail());
 
         final Context thatContext = this.context;
