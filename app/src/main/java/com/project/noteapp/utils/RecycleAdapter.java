@@ -1,6 +1,7 @@
 package com.project.noteapp.utils;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -20,11 +21,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.vision.Frame;
 import com.google.android.gms.vision.text.TextBlock;
 import com.google.android.gms.vision.text.TextRecognizer;
 import com.project.noteapp.ImageViewerActivity;
+import com.project.noteapp.MainActivity;
 import com.project.noteapp.R;
 import com.squareup.picasso.Picasso;
 
@@ -97,9 +100,8 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
                 thatContext.startActivity(intent);
             }
         };
-        holder.getTitle().setOnClickListener(openImageListener);
-        holder.getThumbnail().setOnClickListener(openImageListener);
 
+        final int thatPosition = holder.getAdapterPosition();
         final TextView thatOptionsMenu = holder.getOptionsMenu();
         View.OnClickListener optionsMenuListener = new View.OnClickListener() {
             @Override
@@ -109,12 +111,38 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
                 popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
+                        final String filePath = currentFile.getPath();
                         switch (item.getItemId()) {
                             case R.id.delete_option:
-                                // TODO: Delete option functionality
+                                AlertDialog.Builder builder = new AlertDialog.Builder(thatContext);
+                                builder.setTitle("Confirm");
+                                builder.setMessage("Are you sure?" + currentFile.getName() + " will be deleted.");
+                                builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                });
+                                builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        File file = new File(filePath);
+                                        boolean deleteSuccess = file.delete();
+                                        if (deleteSuccess) {
+                                            Toast.makeText(thatContext, "File was successfully deleted!",
+                                                    Toast.LENGTH_SHORT).show();
+                                            objects.remove(thatPosition);
+                                            notifyItemRemoved(thatPosition);
+                                            notifyItemRangeChanged(thatPosition, objects.size());
+                                        } else {
+                                            Toast.makeText(thatContext, "Failed to delete file.",
+                                                    Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                });
+                                AlertDialog alert = builder.create();
+                                alert.show();
                                 break;
                             case R.id.convert_text_option:
-                                String filePath = currentFile.getPath();
                                 Bitmap bitMap = BitmapFactory.decodeFile(filePath);
                                 TextExtractor textExtractor = new TextExtractor(thatContext, that.storageDir);
                                 textExtractor.generateTextFileFromImage(bitMap);
@@ -126,6 +154,9 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
                 popup.show();
             }
         };
+
+        holder.getTitle().setOnClickListener(openImageListener);
+        holder.getThumbnail().setOnClickListener(openImageListener);
         holder.getOptionsMenu().setOnClickListener(optionsMenuListener);
     }
 
