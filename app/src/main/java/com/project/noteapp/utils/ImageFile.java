@@ -1,24 +1,28 @@
 package com.project.noteapp.utils;
 
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 
-public class ImageFile {
+import com.project.noteapp.ImageViewerActivity;
+
+import java.io.File;
+
+public class ImageFile extends ListItem{
 
     private Bitmap imageThumbnail;
     private String imageFileName;
 
-    public ImageFile(Bitmap thumbnail, String fileName) {
-        this.imageThumbnail = thumbnail;
-        this.imageFileName = fileName;
+
+    public ImageFile(File file) {
+        super(file);
     }
 
     public void setThumbnail(Bitmap thumbnail) {
         this.imageThumbnail = thumbnail;
     }
 
-    public void setTitle(String fileName) {
-        this.imageFileName = fileName;
-    }
 
     public Bitmap getThumbnail() {
         return this.imageThumbnail;
@@ -26,5 +30,11 @@ public class ImageFile {
 
     public String getFileName() {
         return this.imageFileName;
+    }
+
+    public void clicked(Context thatContext) {
+        Intent intent = new Intent(thatContext, ImageViewerActivity.class);
+        intent.setData(Uri.fromFile(this.getFile()));
+        thatContext.startActivity(intent);
     }
 }

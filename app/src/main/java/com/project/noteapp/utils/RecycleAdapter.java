@@ -68,20 +68,6 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
     @Override
     public void onBindViewHolder(RecyclerViewHolder holder, int position) {
         final File currentFile = objects.get(position);
-        Bitmap currentThumbnail;
-
-        //Temporary
-        if(!currentFile.isDirectory()) {
-            currentThumbnail = ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(currentFile.getPath())
-                    , THUMBNAIL_SIZE, THUMBNAIL_SIZE);
-        } else {
-            Drawable d = context.getResources().getDrawable(R.drawable.camera_icon);
-            currentThumbnail = ThumbnailUtils.extractThumbnail(((BitmapDrawable)d).getBitmap(), THUMBNAIL_SIZE, THUMBNAIL_SIZE);
-        }
-
-        ImageFile imageFile = new ImageFile(currentThumbnail, currentFile.getName());
-        holder.setTitle(imageFile.getFileName());
-        holder.setThumbnail(currentThumbnail);
 
         //Check if the current file is an directory or an image file, displays the thumbnail image
         if(!currentFile.isDirectory()) {
@@ -94,10 +80,16 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
         final RecycleAdapter that = this;
         View.OnClickListener openImageListener = new View.OnClickListener() {
             @Override
+
             public void onClick(View v) {
-                Intent intent = new Intent(thatContext, ImageViewerActivity.class);
-                intent.setData(Uri.fromFile(currentFile));
-                thatContext.startActivity(intent);
+                if(!currentFile.isDirectory()) {
+                    ImageFile image = new ImageFile(currentFile);
+                    image.clicked(thatContext);
+                } else  {
+                    Folder folder = new Folder(currentFile);
+                    folder.clicked(thatContext);
+
+                }
             }
         };
 
@@ -116,10 +108,6 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
                             case R.id.delete_option:
 
                                 // TODO: Delete option functionality
-                                if(!currentFile.delete()) {
-                                    Log.d("item", "unable to delete");
-                                }
-                                new ApplicationPathDataRetrievalTask(this, null, (RecyclerView) findViewById(R.id.recyclerview), getApplicationStorageDirectory()).execute();
 
 
                                 AlertDialog.Builder builder = new AlertDialog.Builder(thatContext);
