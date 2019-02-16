@@ -112,6 +112,11 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
                         switch (item.getItemId()) {
                             case R.id.delete_option:
                                 // TODO: Delete option functionality
+                                if(!currentFile.delete()) {
+                                    Log.d("item", "unable to delete");
+                                }
+                                new ApplicationPathDataRetrievalTask(this, null, (RecyclerView) findViewById(R.id.recyclerview), getApplicationStorageDirectory()).execute();
+
                                 break;
                             case R.id.convert_text_option:
                                 String filePath = currentFile.getPath();

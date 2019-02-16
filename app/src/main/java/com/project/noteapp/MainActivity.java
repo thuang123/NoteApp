@@ -28,6 +28,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
+import com.project.noteapp.utils.ApplicationPathDataRetrievalTask;
 import com.project.noteapp.utils.FolderManager;
 import com.project.noteapp.utils.RecycleAdapter;
 import com.scanlibrary.ScanConstants;
@@ -97,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
         actionbar.setHomeAsUpIndicator(R.drawable.ic_hamburger);
 
         // Find NoteApp image files
-        new ApplicationPathDataRetrievalTask(this, null, (RecyclerView) findViewById(R.id.recyclerview)).execute();
+        new ApplicationPathDataRetrievalTask(this, null, (RecyclerView) findViewById(R.id.recyclerview), getApplicationStorageDirectory()).execute();
     }
 
     @Override
@@ -150,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
                             folderManager.createNewFolder(newFolderName);
                             newFolderName = null;
                             alertDialog.dismiss();
-                            new ApplicationPathDataRetrievalTask(that, null, (RecyclerView) findViewById(R.id.recyclerview)).execute();
+                            new ApplicationPathDataRetrievalTask(that, null, (RecyclerView) findViewById(R.id.recyclerview), getApplicationStorageDirectory()).execute();
                         }
                     }
                 });
@@ -188,7 +189,7 @@ public class MainActivity extends AppCompatActivity {
                 getContentResolver().delete(uri, null, null);
                 System.out.println("Photo was successfully saved into: >>>>>>>>>>>>>>>>>>>>>> " + Uri.fromFile(photoFile).toString());
                 // Update appData displayed in application
-                new ApplicationPathDataRetrievalTask(this, null, (RecyclerView) findViewById(R.id.recyclerview)).execute();
+                new ApplicationPathDataRetrievalTask(this, null, (RecyclerView) findViewById(R.id.recyclerview), getApplicationStorageDirectory()).execute();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -221,55 +222,4 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * Retrieves the data found within the device's picture directory inside NoteApp folder and
-     * passes data to ListAdapter to create ListView of data.
-     */
-    private static class ApplicationPathDataRetrievalTask extends AsyncTask<String, Void, ArrayList<File>> {
-
-        private Context context;
-        private RecycleAdapter appData;
-        private RecyclerView appRecyclerView;
-
-        private ApplicationPathDataRetrievalTask(Context context, RecycleAdapter appData, RecyclerView appRecyclerView) {
-            this.context = context;
-            this.appData = appData;
-            this.appRecyclerView = appRecyclerView;
-        }
-
-        /**
-         * The main purpose of AsyncTask used here to retrieve NoteApp data from device's picture directory, so
-         * the main thread can focus on rendering UI functionality.
-         * @returns Array list of all data contained within ../Picture/NoteApp or null if no files are found.
-         * This list is passed into onPostExecute() method immediately for processing.
-         */
-        @Override
-        protected ArrayList<File> doInBackground(String... params) {
-            String noteAppPicturePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).toString() + "/NoteApp";
-            File directory = new File(noteAppPicturePath);
-            File[] files = directory.listFiles();
-            if (files != null && files.length != 0) {
-                return new ArrayList<>(Arrays.asList(files));
-            } else {
-                return null;
-            }
-        }
-
-        /**
-         * @param result array list containing all data contained within device's ../Picture/NoteApp directory.
-         * Processes application data by passing data to a new RecycleAdapter that setups View objects and attaches listeners.
-         * RecycleAdapter is then attached to application's recyclerView which is contains the list data seen in application's MainActivity.
-         */
-        @Override
-        protected void onPostExecute(ArrayList<File> result) {
-            super.onPostExecute(result);
-            if (result != null && !result.isEmpty()) {
-                RecyclerView recyclerView = this.appRecyclerView;
-                this.appData = new RecycleAdapter(this.context, result, getApplicationStorageDirectory());
-                recyclerView.setAdapter(this.appData);
-            } else {
-                System.out.println("Data was empty <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
-            }
-        }
-    }
 }
