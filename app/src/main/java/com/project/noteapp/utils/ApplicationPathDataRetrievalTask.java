@@ -1,6 +1,7 @@
 package com.project.noteapp.utils;
 
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Environment;
@@ -20,13 +21,15 @@ public class ApplicationPathDataRetrievalTask extends AsyncTask<String, Void, Ar
     private RecycleAdapter appData;
     private RecyclerView appRecyclerView;
     private File storageDirectory;
+    private Activity activity;
 
     public ApplicationPathDataRetrievalTask(Context context, RecycleAdapter appData, RecyclerView appRecyclerView
-    , File storageDirectory) {
+    , File storageDirectory, Activity activity) {
         this.context = context;
         this.appData = appData;
         this.appRecyclerView = appRecyclerView;
         this.storageDirectory = storageDirectory;
+        this.activity = activity;
     }
 
     /**
@@ -57,7 +60,7 @@ public class ApplicationPathDataRetrievalTask extends AsyncTask<String, Void, Ar
         super.onPostExecute(result);
         if (result != null && !result.isEmpty()) {
             RecyclerView recyclerView = this.appRecyclerView;
-            this.appData = new RecycleAdapter(this.context, result, storageDirectory);
+            this.appData = new RecycleAdapter(this.context, result, storageDirectory, this.activity);
             recyclerView.setAdapter(this.appData);
         } else {
             System.out.println("Data was empty <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");

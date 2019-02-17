@@ -7,12 +7,14 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -25,21 +27,22 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 
 import com.project.noteapp.utils.ApplicationPathDataRetrievalTask;
+import com.project.noteapp.utils.FileStatePagerAdapter;
+import com.project.noteapp.utils.Folder;
 import com.project.noteapp.utils.FolderManager;
-import com.project.noteapp.utils.RecycleAdapter;
 import com.scanlibrary.ScanConstants;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements FolderFragment.OnFragmentInteractionListener {
 
     private final static String TAG = "MainActivity";
     private final static int REQUEST_CODE = 99;
@@ -52,6 +55,10 @@ public class MainActivity extends AppCompatActivity {
 
     private DrawerLayout drawerlayout;
 
+    private FileStatePagerAdapter mFileStatePagerAdapter;
+
+    private FrameLayout fragmentContainer;
+    private Button backButton;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -97,8 +104,24 @@ public class MainActivity extends AppCompatActivity {
         actionbar.setDisplayHomeAsUpEnabled(true);
         actionbar.setHomeAsUpIndicator(R.drawable.ic_hamburger);
 
+        fragmentContainer = (FrameLayout)findViewById(R.id.fragment_container);
+
         // Find NoteApp image files
-        new ApplicationPathDataRetrievalTask(this, null, (RecyclerView) findViewById(R.id.recyclerview), getApplicationStorageDirectory()).execute();
+        new ApplicationPathDataRetrievalTask(this, null, (RecyclerView) findViewById(R.id.recyclerview), getApplicationStorageDirectory(), this).execute();
+    }
+
+    public void openFolderFragment() {
+        FolderFragment fragment = new FolderFragment().newInstance();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.addToBackStack(null);  // if written, this transaction will be added to backstack
+        transaction.add(R.id.fragment_container, fragment, "FOLDER_FRAGMENT").commit();
+
+    }
+
+    @Override
+    public void onFragmentInteraction() {
+        onBackPressed();
     }
 
     @Override
@@ -141,6 +164,7 @@ public class MainActivity extends AppCompatActivity {
                 });
                 // Set up the buttons
                 final Context that = this;
+                final Activity thatActivity  = this;
                 builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
@@ -151,7 +175,7 @@ public class MainActivity extends AppCompatActivity {
                             folderManager.createNewFolder(newFolderName);
                             newFolderName = null;
                             alertDialog.dismiss();
-                            new ApplicationPathDataRetrievalTask(that, null, (RecyclerView) findViewById(R.id.recyclerview), getApplicationStorageDirectory()).execute();
+                            new ApplicationPathDataRetrievalTask(that, null, (RecyclerView) findViewById(R.id.recyclerview), getApplicationStorageDirectory(), thatActivity).execute();
                         }
                     }
                 });
@@ -189,7 +213,7 @@ public class MainActivity extends AppCompatActivity {
                 getContentResolver().delete(uri, null, null);
                 System.out.println("Photo was successfully saved into: >>>>>>>>>>>>>>>>>>>>>> " + Uri.fromFile(photoFile).toString());
                 // Update appData displayed in application
-                new ApplicationPathDataRetrievalTask(this, null, (RecyclerView) findViewById(R.id.recyclerview), getApplicationStorageDirectory()).execute();
+                new ApplicationPathDataRetrievalTask(this, null, (RecyclerView) findViewById(R.id.recyclerview), getApplicationStorageDirectory(), this).execute();
             } catch (IOException e) {
                 e.printStackTrace();
             }

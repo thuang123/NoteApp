@@ -1,5 +1,6 @@
 package com.project.noteapp.utils;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -42,12 +43,14 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
     private Context context;
     private List<File> objects;
     private final File storageDir;
+    private Activity activity;
 
-    public RecycleAdapter(@NonNull Context context, @NonNull List<File> objects, File storageDir) {
+    public RecycleAdapter(@NonNull Context context, @NonNull List<File> objects, File storageDir, Activity activity) {
         this.inflater = LayoutInflater.from(context);
         this.context = context;
         this.objects = objects;
         this.storageDir = storageDir;
+        this.activity = activity;
     }
 
     @Override
@@ -78,6 +81,7 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
 
         final Context thatContext = this.context;
         final RecycleAdapter that = this;
+        final Activity thatactivity = this.activity;
         View.OnClickListener openImageListener = new View.OnClickListener() {
             @Override
 
@@ -86,7 +90,7 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
                     ImageFile image = new ImageFile(currentFile);
                     image.clicked(thatContext);
                 } else  {
-                    Folder folder = new Folder(currentFile);
+                    Folder folder = new Folder(currentFile, thatactivity);
                     folder.clicked(thatContext);
 
                 }
@@ -108,7 +112,6 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
                             case R.id.delete_option:
 
                                 // TODO: Delete option functionality
-
 
                                 AlertDialog.Builder builder = new AlertDialog.Builder(thatContext);
                                 builder.setTitle("Confirm");
@@ -137,6 +140,7 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
                                 });
                                 AlertDialog alert = builder.create();
                                 alert.show();
+
 
                                 break;
                             case R.id.convert_text_option:

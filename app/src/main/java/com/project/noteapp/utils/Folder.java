@@ -1,26 +1,27 @@
 package com.project.noteapp.utils;
 
+import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
+import android.support.v4.view.ViewPager;
 
-import com.project.noteapp.FolderFragment;
-import com.project.noteapp.ImageViewerActivity;
+import com.project.noteapp.MainActivity;
 
 import java.io.File;
 
 public class Folder extends ListItem {
-
-    public Folder(File file) {
+    private FileStatePagerAdapter mFileStatePagerAdapter;
+    private ViewPager mViewPager;
+    private Activity activity;
+    public Folder(File file, Activity activity) {
         super(file);
+        this.activity = activity;
     }
 
     @Override
     public void clicked(Context thatContext) {
-        Intent intent = new Intent(thatContext, FolderFragment.class);
-        intent.setData(Uri.fromFile(this.getFile()));
-        thatContext.startActivity(intent);
-
+        if(activity instanceof MainActivity) {
+            ((MainActivity)activity).openFolderFragment();
+        }
     }
 
 
