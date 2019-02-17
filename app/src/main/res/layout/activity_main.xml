@@ -39,12 +39,13 @@
             </FrameLayout>
         </LinearLayout>
 
-        <LinearLayout android:layout_width="fill_parent"
+        <RelativeLayout android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_below="@+id/header_layout"
             android:layout_above="@+id/footer_layout"
             android:id="@+id/recyclerview_layout">
+
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/recyclerview"
                 android:layout_width="fill_parent"
@@ -52,8 +53,12 @@
                 android:layout_weight="1"
                 app:layoutManager="android.support.v7.widget.LinearLayoutManager">
             </android.support.v7.widget.RecyclerView>
+            <FrameLayout
+                android:id="@+id/fragment_container"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+        </RelativeLayout>
 
-        </LinearLayout>
         <LinearLayout android:id="@+id/footer_layout"
             android:layout_height="?attr/actionBarSize"
             android:orientation="horizontal"
@@ -76,10 +81,7 @@
                 app:srcCompat="@drawable/camera_icon" />
         </LinearLayout>
 
-        <FrameLayout
-            android:id="@+id/fragment_container"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+
     </RelativeLayout>
 
 
