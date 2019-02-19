@@ -70,18 +70,24 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
      */
     @Override
     public void onBindViewHolder(RecyclerViewHolder holder, int position) {
+        final Context thatContext = this.context;
+        final RecycleAdapter that = this;
+        final Activity thatActivity = this.activity;
         final File currentFile = objects.get(position);
-
+        ListItem item;
         //Check if the current file is an directory or an image file, displays the thumbnail image
         if(!currentFile.isDirectory()) {
+            item = new ImageFile(currentFile);
             Picasso.get().load(currentFile).fit().into(holder.getThumbnail());
         } else {
+            item = new Folder(currentFile, thatActivity);
             Picasso.get().load(R.drawable.ic_bluefolder).resize(50,50).into(holder.getThumbnail());
         }
 
-        final Context thatContext = this.context;
-        final RecycleAdapter that = this;
-        final Activity thatactivity = this.activity;
+
+        holder.setTitle(item.getFileName());
+
+
         View.OnClickListener openImageListener = new View.OnClickListener() {
             @Override
 
@@ -90,19 +96,20 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
                     ImageFile image = new ImageFile(currentFile);
                     image.clicked(thatContext);
                 } else  {
-                    Folder folder = new Folder(currentFile, thatactivity);
+                    Folder folder = new Folder(currentFile, thatActivity);
                     folder.clicked(thatContext);
 
                 }
             }
         };
 
-        final int thatPosition = holder.getAdapterPosition();
-        final TextView thatOptionsMenu = holder.getOptionsMenu();
+        final int currentPosition = holder.getAdapterPosition();
+        final TextView optionsMenu = holder.getOptionsMenu();
+        final ListItem currentItem = item;
         View.OnClickListener optionsMenuListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                PopupMenu popup = new PopupMenu(thatContext, thatOptionsMenu);
+                PopupMenu popup = new PopupMenu(thatContext, optionsMenu);
                 popup.inflate(R.menu.options_menu);
                 popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
@@ -110,9 +117,6 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
                         final String filePath = currentFile.getPath();
                         switch (item.getItemId()) {
                             case R.id.delete_option:
-
-                                // TODO: Delete option functionality
-
                                 AlertDialog.Builder builder = new AlertDialog.Builder(thatContext);
                                 builder.setTitle("Confirm");
                                 builder.setMessage("Are you sure?" + currentFile.getName() + " will be deleted.");
@@ -124,18 +128,7 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
                                 });
                                 builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int which) {
-                                        File file = new File(filePath);
-                                        boolean deleteSuccess = file.delete();
-                                        if (deleteSuccess) {
-                                            Toast.makeText(thatContext, "File was successfully deleted!",
-                                                    Toast.LENGTH_SHORT).show();
-                                            objects.remove(thatPosition);
-                                            notifyItemRemoved(thatPosition);
-                                            notifyItemRangeChanged(thatPosition, objects.size());
-                                        } else {
-                                            Toast.makeText(thatContext, "Failed to delete file.",
-                                                    Toast.LENGTH_SHORT).show();
-                                        }
+                                        currentItem.deleteListItem(thatContext, that, objects, currentPosition);
                                     }
                                 });
                                 AlertDialog alert = builder.create();

@@ -11,25 +11,8 @@ import java.io.File;
 
 public class ImageFile extends ListItem{
 
-    private Bitmap imageThumbnail;
-    private String imageFileName;
-
-
     public ImageFile(File file) {
         super(file);
-    }
-
-    public void setThumbnail(Bitmap thumbnail) {
-        this.imageThumbnail = thumbnail;
-    }
-
-
-    public Bitmap getThumbnail() {
-        return this.imageThumbnail;
-    }
-
-    public String getFileName() {
-        return this.imageFileName;
     }
 
     public void clicked(Context thatContext) {
