@@ -41,11 +41,11 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
 
     private LayoutInflater inflater;
     private Context context;
-    private List<File> objects;
+    private List<ListItem> objects;
     private final File storageDir;
     private Activity activity;
 
-    public RecycleAdapter(@NonNull Context context, @NonNull List<File> objects, File storageDir, Activity activity) {
+    public RecycleAdapter(@NonNull Context context, @NonNull List<ListItem> objects, File storageDir, Activity activity) {
         this.inflater = LayoutInflater.from(context);
         this.context = context;
         this.objects = objects;
@@ -73,8 +73,11 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
         final Context thatContext = this.context;
         final RecycleAdapter that = this;
         final Activity thatActivity = this.activity;
-        final File currentFile = objects.get(position);
-        ListItem item;
+        final ListItem currentItem = objects.get(position);
+
+
+        currentItem.showThumbnail(holder.getThumbnail());
+        /*
         //Check if the current file is an directory or an image file, displays the thumbnail image
         if(!currentFile.isDirectory()) {
             item = new ImageFile(currentFile);
@@ -83,15 +86,17 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
             item = new Folder(currentFile, thatActivity);
             Picasso.get().load(R.drawable.ic_bluefolder).resize(50,50).into(holder.getThumbnail());
         }
+*/
 
-
-        holder.setTitle(item.getFileName());
+        holder.setTitle(currentItem.getFileName());
 
 
         View.OnClickListener openImageListener = new View.OnClickListener() {
             @Override
 
             public void onClick(View v) {
+                currentItem.clicked(thatContext);
+                /*
                 if(!currentFile.isDirectory()) {
                     ImageFile image = new ImageFile(currentFile);
                     image.clicked(thatContext);
@@ -99,13 +104,13 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
                     Folder folder = new Folder(currentFile, thatActivity);
                     folder.clicked(thatContext);
 
-                }
+                }*/
             }
         };
 
         final int currentPosition = holder.getAdapterPosition();
         final TextView optionsMenu = holder.getOptionsMenu();
-        final ListItem currentItem = item;
+        // final ListItem currentItem = item;
         View.OnClickListener optionsMenuListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -114,12 +119,12 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
                 popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
-                        final String filePath = currentFile.getPath();
+                        final String filePath = currentItem.getFile().getPath();
                         switch (item.getItemId()) {
                             case R.id.delete_option:
                                 AlertDialog.Builder builder = new AlertDialog.Builder(thatContext);
                                 builder.setTitle("Confirm");
-                                builder.setMessage("Are you sure?" + currentFile.getName() + " will be deleted.");
+                                builder.setMessage("Are you sure?" + currentItem.getFileName() + " will be deleted.");
                                 builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {

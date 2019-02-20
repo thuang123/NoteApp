@@ -3,6 +3,7 @@ package com.project.noteapp.utils;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import java.io.File;
@@ -33,7 +34,9 @@ public abstract class ListItem {
 
     public abstract void clicked(Context thatContext);
 
-    public void deleteListItem(Context context, RecycleAdapter adapter, List<File> objects , int position) {
+    public abstract void showThumbnail(ImageView thumbnail);
+
+    public void deleteListItem(Context context, RecycleAdapter adapter, List<ListItem> objects , int position) {
         boolean deleteSuccess = file.delete();
         if (deleteSuccess) {
             Toast.makeText(context, "File was successfully deleted!",

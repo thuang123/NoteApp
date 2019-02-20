@@ -15,7 +15,7 @@ import java.util.Arrays;
  * Retrieves the data found within the device's picture directory inside NoteApp folder and
  * passes data to ListAdapter to create ListView of data.
  */
-public class ApplicationPathDataRetrievalTask extends AsyncTask<String, Void, ArrayList<File>> {
+public class ApplicationPathDataRetrievalTask extends AsyncTask<String, Void, ArrayList<ListItem>> {
 
     private Context context;
     private RecycleAdapter appData;
@@ -39,12 +39,22 @@ public class ApplicationPathDataRetrievalTask extends AsyncTask<String, Void, Ar
      * This list is passed into onPostExecute() method immediately for processing.
      */
     @Override
-    protected ArrayList<File> doInBackground(String... params) {
+    protected ArrayList<ListItem> doInBackground(String... params) {
         String noteAppPicturePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).toString() + "/NoteApp";
         File directory = new File(noteAppPicturePath);
         File[] files = directory.listFiles();
-        if (files != null && files.length != 0) {
-            return new ArrayList<>(Arrays.asList(files));
+        ArrayList<ListItem> list = new ArrayList<>();
+        for (File file : files) {
+            if(!file.isDirectory()) {
+                ListItem item = new ImageFile(file);
+                list.add(item);
+            } else {
+                ListItem item = new Folder(file, this.activity);
+                list.add(item);
+            }
+        }
+        if (list != null && list.size() != 0) {
+            return list;
         } else {
             return null;
         }
@@ -56,7 +66,7 @@ public class ApplicationPathDataRetrievalTask extends AsyncTask<String, Void, Ar
      * RecycleAdapter is then attached to application's recyclerView which is contains the list data seen in application's MainActivity.
      */
     @Override
-    protected void onPostExecute(ArrayList<File> result) {
+    protected void onPostExecute(ArrayList<ListItem> result) {
         super.onPostExecute(result);
         if (result != null && !result.isEmpty()) {
             RecyclerView recyclerView = this.appRecyclerView;
