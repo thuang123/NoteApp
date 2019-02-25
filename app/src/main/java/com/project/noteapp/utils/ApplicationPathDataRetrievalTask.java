@@ -9,7 +9,6 @@ import android.support.v7.widget.RecyclerView;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * Retrieves the data found within the device's picture directory inside NoteApp folder and
@@ -76,4 +75,5 @@ public class ApplicationPathDataRetrievalTask extends AsyncTask<String, Void, Ar
             System.out.println("Data was empty <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
         }
     }
+
 }

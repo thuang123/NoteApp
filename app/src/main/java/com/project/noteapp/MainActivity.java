@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.design.widget.NavigationView;
@@ -14,7 +15,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
-import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -27,20 +27,21 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 
 import com.project.noteapp.utils.ApplicationPathDataRetrievalTask;
-import com.project.noteapp.utils.FileStatePagerAdapter;
 import com.project.noteapp.utils.Folder;
 import com.project.noteapp.utils.FolderManager;
+import com.project.noteapp.utils.ListItem;
+import com.project.noteapp.utils.RecycleAdapter;
 import com.scanlibrary.ScanConstants;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements FolderFragment.OnFragmentInteractionListener {
 
@@ -54,11 +55,9 @@ public class MainActivity extends AppCompatActivity implements FolderFragment.On
     private String newFolderName;
 
     private DrawerLayout drawerlayout;
-
-    private FileStatePagerAdapter mFileStatePagerAdapter;
+    private NavigationView navigationView;
 
     private FrameLayout fragmentContainer;
-    private Button backButton;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,7 +81,7 @@ public class MainActivity extends AppCompatActivity implements FolderFragment.On
         });
 
         drawerlayout = findViewById(R.id.drawer_layout);
-        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
                     @Override
@@ -98,6 +97,7 @@ public class MainActivity extends AppCompatActivity implements FolderFragment.On
                         return true;
                     }
                 });
+        //populateNav();
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionbar = getSupportActionBar();
@@ -175,16 +175,13 @@ public class MainActivity extends AppCompatActivity implements FolderFragment.On
                             folderManager.createNewFolder(newFolderName);
                             newFolderName = null;
                             alertDialog.dismiss();
-                            new ApplicationPathDataRetrievalTask(that, null, (RecyclerView) findViewById(R.id.recyclerview), getApplicationStorageDirectory(), thatActivity).execute();
+                            ApplicationPathDataRetrievalTask app =
+                                    new ApplicationPathDataRetrievalTask(that, null, (RecyclerView) findViewById(R.id.recyclerview), getApplicationStorageDirectory(), thatActivity);
+                            app.execute();
                         }
                     }
                 });
 
-/**
-                if (newFolderName != null && !newFolderName.equals("")) {
-                    this.folderManager.createNewFolder(newFolderName);
-                    newFolderName = null;
-                }*/
                 builder.show();
 
         }
@@ -244,6 +241,16 @@ public class MainActivity extends AppCompatActivity implements FolderFragment.On
             Log.d("NoteApp", "application storage directory retrieval failed.  Either media is READ only or SD is unmounted.");
             return null;
         }
+    }
+
+    public void populateNav(RecycleAdapter data) {
+        final Menu navMenu = navigationView.getMenu();
+        for (ListItem l : data.getFiles()) {
+            if (l instanceof Folder) {
+                navMenu.add((l.getFileName()));
+            }
+        }
+
     }
 
 }

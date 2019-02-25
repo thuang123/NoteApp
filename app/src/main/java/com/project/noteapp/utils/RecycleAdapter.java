@@ -33,6 +33,7 @@ import com.project.noteapp.R;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 public class RecycleAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
@@ -77,34 +78,18 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
 
 
         currentItem.showThumbnail(holder.getThumbnail());
-        /*
-        //Check if the current file is an directory or an image file, displays the thumbnail image
-        if(!currentFile.isDirectory()) {
-            item = new ImageFile(currentFile);
-            Picasso.get().load(currentFile).fit().into(holder.getThumbnail());
-        } else {
-            item = new Folder(currentFile, thatActivity);
-            Picasso.get().load(R.drawable.ic_bluefolder).resize(50,50).into(holder.getThumbnail());
-        }
-*/
 
         holder.setTitle(currentItem.getFileName());
 
+        if(activity instanceof MainActivity) {
+            ((MainActivity)activity).populateNav(this);
+        }
 
         View.OnClickListener openImageListener = new View.OnClickListener() {
             @Override
 
             public void onClick(View v) {
                 currentItem.clicked(thatContext);
-                /*
-                if(!currentFile.isDirectory()) {
-                    ImageFile image = new ImageFile(currentFile);
-                    image.clicked(thatContext);
-                } else  {
-                    Folder folder = new Folder(currentFile, thatActivity);
-                    folder.clicked(thatContext);
-
-                }*/
             }
         };
 
@@ -162,5 +147,9 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
     @Override
     public int getItemCount() {
         return objects.size();
+    }
+
+    public List<ListItem> getFiles() {
+        return objects;
     }
 }
