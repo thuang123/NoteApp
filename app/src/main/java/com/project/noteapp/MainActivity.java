@@ -42,6 +42,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements FolderFragment.OnFragmentInteractionListener {
 
@@ -58,6 +59,8 @@ public class MainActivity extends AppCompatActivity implements FolderFragment.On
     private NavigationView navigationView;
 
     private FrameLayout fragmentContainer;
+
+    private  ArrayList<ListItem> FolderList = new ArrayList<ListItem>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,12 +85,17 @@ public class MainActivity extends AppCompatActivity implements FolderFragment.On
 
         drawerlayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.nav_view);
+        navigationView.bringToFront();
         navigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
                     @Override
                     public boolean onNavigationItemSelected(MenuItem menuItem) {
+                        Log.d("clicked","clicked");
+                        selectDrawerItem(menuItem);
+
                         // set item as selected to persist highlight
                         menuItem.setChecked(true);
+
                         // close drawer when item is tapped
                         drawerlayout.closeDrawers();
 
@@ -248,6 +256,19 @@ public class MainActivity extends AppCompatActivity implements FolderFragment.On
         for (ListItem l : data.getFiles()) {
             if (l instanceof Folder) {
                 navMenu.add((l.getFileName()));
+                FolderList.add(l);
+            }
+        }
+
+    }
+
+    public void selectDrawerItem(MenuItem menuitem) {
+        String title = menuitem.getTitle().toString();
+        Log.d("title","title" + title);
+        for (ListItem f : FolderList) {
+            if (title.equals(f.getFileName())) {
+                f.clicked(this);
+                break;
             }
         }
 

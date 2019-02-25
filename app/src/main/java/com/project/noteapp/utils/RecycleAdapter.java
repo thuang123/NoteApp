@@ -38,15 +38,15 @@ import java.util.List;
 
 public class RecycleAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
 
-    private final int THUMBNAIL_SIZE = 64;
+    private final int THUMBNAAIL_SIZE = 64;
 
     private LayoutInflater inflater;
     private Context context;
-    private List<ListItem> objects;
+    private ArrayList<ListItem> objects;
     private final File storageDir;
     private Activity activity;
 
-    public RecycleAdapter(@NonNull Context context, @NonNull List<ListItem> objects, File storageDir, Activity activity) {
+    public RecycleAdapter(@NonNull Context context, @NonNull ArrayList<ListItem> objects, File storageDir, Activity activity) {
         this.inflater = LayoutInflater.from(context);
         this.context = context;
         this.objects = objects;
@@ -149,7 +149,7 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
         return objects.size();
     }
 
-    public List<ListItem> getFiles() {
+    public ArrayList<ListItem> getFiles() {
         return objects;
     }
 }
